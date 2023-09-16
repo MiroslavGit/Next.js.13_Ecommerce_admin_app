@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Product } from '@/../models/Product';
 import { mongooseConnect } from '@/../lib/mongoose';
 
+/* Get all products */
+export async function GET(req: NextRequest) {
+  await mongooseConnect();
+
+  try {
+    const products = await Product.find();
+    return NextResponse.json({ status: 200, data: products });
+  } catch (error: any) {
+    return NextResponse.json({ status: 500, error: error.message });
+  }
+}
+
+/* Post new product */
 export async function POST(req: NextRequest) {
   await mongooseConnect();
   const data = await req.json();
@@ -14,13 +27,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
-  await mongooseConnect();
-
-  try {
-    const products = await Product.find();
-    return NextResponse.json({ status: 200, data: products });
-  } catch (error: any) {
-    return NextResponse.json({ status: 500, error: error.message });
-  }
-}

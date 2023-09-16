@@ -25,11 +25,19 @@ export default function DeleteProduct() {
     });
   }, [id])
 
+  async function deleteProduct() {
+    await axios.delete(`/api/products/${id}`).then((res) => {
+      if (res.status === 200) {
+        goBack();
+      }
+    });
+  }
+
   return (
     <Layout>
       <h1 className="h1 text-center py-2"> Do you really want to delete product <b>{productInfo?.title}</b> ? </h1>
       <div className="flex gap-2 justify-center">
-        <button className="btn-red">Yes</button>
+        <button onClick={deleteProduct} className="btn-red">Yes</button>
         <button onClick={goBack} className="btn-default">No</button>
       </div>
     </Layout>

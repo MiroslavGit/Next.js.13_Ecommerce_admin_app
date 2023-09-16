@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Product } from '@/../models/Product';
 import { mongooseConnect } from '@/../lib/mongoose';
 
+/* Get product by ID */
 export async function GET(req: NextRequest) {
 	await mongooseConnect();
 	const id = req.url.split('/').pop();
@@ -14,6 +15,7 @@ export async function GET(req: NextRequest) {
 	}
 }
 
+/* Update product by ID */
 export async function PUT(req: NextRequest) {
 	await mongooseConnect();
 	const id = req.url.split('/').pop();
@@ -21,6 +23,19 @@ export async function PUT(req: NextRequest) {
 
 	try {
 		const product = await Product.updateOne({ _id: id }, data);
+		return NextResponse.json({ status: 200, product: product });
+	} catch (error: any) {
+		return NextResponse.json({ status: 500, error: error.message });
+	}
+}
+
+/* Delete product by ID */
+export async function DELETE(req: NextRequest) {
+	await mongooseConnect();
+	const id = req.url.split('/').pop();
+
+	try {
+		const product = await Product.deleteOne({ _id: id });
 		return NextResponse.json({ status: 200, product: product });
 	} catch (error: any) {
 		return NextResponse.json({ status: 500, error: error.message });

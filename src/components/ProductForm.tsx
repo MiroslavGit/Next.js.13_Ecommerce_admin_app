@@ -10,16 +10,18 @@ export default function ProductForm(props: Product) {
   const router = useRouter();
 
   const [formData, setFormData] = useState<Product>({
+    _id: props._id || undefined,
     title: props.title || "",
     description: props.description || "",
     price: props.price || 0,
+    images: props.images || []
   });
 
   async function saveProduct(e: any) {
     e.preventDefault();
 
-    if (props._id) {
-      await axios.put(`/api/products/${props._id}`, formData).then((res) => {
+    if (formData._id) {
+      await axios.put(`/api/products/${formData._id}`, formData).then((res) => {
         if (res.status === 200) {
           router.push("/products");
         }
@@ -33,18 +35,57 @@ export default function ProductForm(props: Product) {
     }
   }
 
+  async function uploadImages(e: any) {
+    const files = Array.from(e.target?.files);
+
+    if (files?.length > 0) {
+      const data = new FormData();
+      files.forEach((file: any) => data.append("images", file));
+      //console.log("FormData object:", data.getAll("images")); // Log the FormData object
+
+      try {
+        await axios.post("/api/products/uploadImages", data, {
+          headers: { "content-type": "multipart/form-data" }
+        })
+          .then((res) => {
+            if (res.status === 200) {
+              setFormData({ ...formData, images: res.data.images });
+            }
+          });
+      } catch (error) {
+        console.error("Error uploading images:", error);
+      }
+    }
+  }
+
   return (
     <form onSubmit={saveProduct}>
       <label className="label">Product Name</label>
-      <input type="text" placeholder="product name" onChange={(e) => setFormData({ ...formData, title: e.target.value })} value={formData.title} />
+      <input type="text" placeholder="product name" onChange={(e) => setFormData({ ...formData, title: e.target.value })} value={formData.title} className="basicInput" />
 
       <label className="label">Description</label>
-      <textarea placeholder="description" onChange={(e) => setFormData({ ...formData, description: e.target.value })} value={formData.description} />
+      <textarea placeholder="description" onChange={(e) => setFormData({ ...formData, description: e.target.value })} value={formData.description} className="basicTextarea" />
+
+      <label className="label">Photos</label>
+      <div className="mb-2">
+        <label className="w-24 h-24 cursor-pointer flex flex-col items-center justify-center text-gray-500 text-sm rounded-lg bg-gray-200 duration-300 hover:bg-gray-300">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+          </svg>
+          <div>
+            Upload
+          </div>
+          <input type="file" multiple onChange={uploadImages} className="hidden" />
+        </label>
+
+        {!formData.images?.length && <div >No photos in this product</div>}
+      </div>
+
 
       <label className="label">Price (in €)</label>
-      <input type="number" placeholder="price" onChange={(e) => setFormData({ ...formData, price: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value) })} value={formData.price} />
+      <input type="number" placeholder="price" onChange={(e) => setFormData({ ...formData, price: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value) })} value={formData.price} className="basicInput" />
 
-      <button type="submit" className="btn-primary">Save</button>
+      <button type="submit" className="btn-primary">{formData._id ? "Save" : "Create"}</button>
     </form>
   )
 }

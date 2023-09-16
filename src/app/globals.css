@@ -3,23 +3,9 @@
 @tailwind utilities;
 
 /* Global styles */
-/* 1. Method */
-input,
-textarea {
-    @apply border-2 border-gray-300 rounded-md px-1 w-full;
-    @apply mb-2;
-}
 
-input:focus,
-input:hover,
-textarea:focus,
-textarea:hover {
-    @apply border-blue-900;
-}
-
-
-/* 2. Method */
 @layer components {
+
     .h1 {
         @apply text-blue-900 mb-2 text-xl;
     }
@@ -28,8 +14,11 @@ textarea:hover {
         @apply text-blue-900 mb-2 text-sm;
     }
 
-    .btn-primary {
-        @apply bg-blue-900 text-white px-4 py-1 rounded-md;
+    .basicInput,
+    .basicTextarea {
+        @apply border-2 border-gray-300 rounded-md px-1 w-full mb-2;
+        @apply focus:border-blue-900;
+        @apply hover:border-blue-900;
     }
 
     .basicTable {
@@ -44,8 +33,16 @@ textarea:hover {
         @apply border border-blue-200 p-1;
     }
 
-    .editLink {
+    .basicTable tr td:last-child {
+        @apply w-1/6;
+    }
+
+    .btn-edit {
         @apply bg-blue-900 text-white py-1 px-2 rounded-md inline-flex gap-1 items-center mr-2;
+    }
+
+    .btn-primary {
+        @apply bg-blue-900 text-white px-4 py-1 rounded-md;
     }
 
     .btn-red {
