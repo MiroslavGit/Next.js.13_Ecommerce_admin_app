@@ -35,6 +35,31 @@ export default function ProductForm(props: Product) {
     }
   }
 
+  async function getImages() {
+    try {
+      axios
+        .get(`/api/products/${formData._id}/uploadImages`, {
+          responseType: 'arraybuffer'
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            const uint8Array = new Uint8Array(res.data);
+
+            // Convert the Uint8Array to a binary string
+            const binaryString = uint8Array.reduce((data, byte) => data + String.fromCharCode(byte), '');
+
+            // Convert the binary string to base64
+            const base64String = btoa(binaryString);
+
+            setFormData({ ...formData, images: [...(formData.images || []), base64String] });
+          }
+        });
+    }
+    catch (error) {
+      console.error("Error getting images:", error);
+    }
+  }
+
   async function uploadImages(e: any) {
     const files = Array.from(e.target?.files);
 
@@ -44,12 +69,13 @@ export default function ProductForm(props: Product) {
       //console.log("FormData object:", data.getAll("images")); // Log the FormData object
 
       try {
-        await axios.post("/api/products/uploadImages", data, {
-          headers: { "content-type": "multipart/form-data" }
-        })
+        await axios
+          .post(`/api/products/${formData._id}/uploadImages`, data, {
+            headers: { "content-type": "multipart/form-data" }
+          })
           .then((res) => {
             if (res.status === 200) {
-              setFormData({ ...formData, images: res.data.images });
+              getImages();
             }
           });
       } catch (error) {
@@ -67,7 +93,15 @@ export default function ProductForm(props: Product) {
       <textarea placeholder="description" onChange={(e) => setFormData({ ...formData, description: e.target.value })} value={formData.description} className="basicTextarea" />
 
       <label className="label">Photos</label>
-      <div className="mb-2">
+      <div className="mb-2 flex flex-wrap gap-2">
+        {formData.images?.map(image => {
+          return (
+            <div key={image} className="h-24">
+              <img src={`data:image/jpeg;base64,${image}`} alt={formData.title} className="img" />
+            </div>
+          )
+        })}
+
         <label className="w-24 h-24 cursor-pointer flex flex-col items-center justify-center text-gray-500 text-sm rounded-lg bg-gray-200 duration-300 hover:bg-gray-300">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
@@ -78,7 +112,7 @@ export default function ProductForm(props: Product) {
           <input type="file" multiple onChange={uploadImages} className="hidden" />
         </label>
 
-        {!formData.images?.length && <div >No photos in this product</div>}
+        {!formData.images?.length && <div>No photos in this product</div>}
       </div>
 
 
