@@ -4,20 +4,20 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 
 export default function Nav() {
-  const inactiveLink = "flex gap-1 p-1";
+  const inactiveLink = "text-lg flex gap-1 p-1";
   const activeLink = inactiveLink + " bg-white text-blue-900 rounded-l-lg";
   const pathname = usePathname();
 
   return (
-    <aside className="text-white p-4 pr-0">
-      <Link href="/" className="flex gap-1 mb-4 mr-4">
+    <aside className="text-white text-lg p-4 pr-0">
+      <Link href="/" className="flex gap-2 mb-9 mr-4 duration-150 hover:text-blue-100">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
         </svg>
         Ecommerce Admin
       </Link>
 
-      <nav className="flex flex-col gap-2">
+      <nav className="flex flex-col gap-3">
         <Link href="/" className={pathname === "/" ? activeLink : inactiveLink}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />

@@ -34,7 +34,6 @@ export async function POST(req: NextRequest, { params }: Params) {
       const stream = Readable.from(buffer);
 
       const uploadStream = bucket.openUploadStream(filename, {
-        // make sure to add content type so that it will be easier to set later.
         contentType: blob.type,
         metadata: { productId: params.id },
       });
@@ -44,36 +43,5 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
   }
 
-  // return the response after all the entries have been processed.
-  return NextResponse.json({ status: 200, success: true });
-}
-
-export async function GET(req: NextRequest, { params }: Params) {
-  // 1. get GridFS bucket
-  const { bucket } = await connectToDb();
-
-  const productID = params.id as string;;
-  // 2. validate the filename
-  if (!productID) {
-    return new NextResponse(null, { status: 400, statusText: "Bad Request" });
-  }
-
-  const files = await bucket.find({ "metadata.productId": productID }).toArray();
-  if (!files.length) {
-    return new NextResponse(null, { status: 404, statusText: "Images to this product not found" });
-  }
-
-  // 3. get file data
-  const file = files.at(0)!;
-
-  // 4. get the file contents as stream
-  // Force the type to be ReadableStream since NextResponse doesn't accept GridFSBucketReadStream
-  const stream = bucket.openDownloadStreamByName(file.filename) as unknown as ReadableStream;
-
-  // 5. return a streamed response
-  return new NextResponse(stream, {
-    headers: {
-      "Content-Type": file.contentType!,
-    },
-  });
+  return NextResponse.json({ status: 200, uploaded: true });
 }

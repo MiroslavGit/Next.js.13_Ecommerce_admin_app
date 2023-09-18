@@ -22,6 +22,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/mongodb.tsxx", "src/app/api/route.js", "src/app/api/products/route.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "lib/mongodb.tsxx", "src/app/api/route.js", "src/app/api/products/route.js", "src/app/api/products/[id]/getImages/route.js"],
   "exclude": ["node_modules"]
 }

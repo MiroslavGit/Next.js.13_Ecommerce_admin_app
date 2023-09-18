@@ -3,11 +3,17 @@
 import { useState } from "react";
 import axios from "axios";
 import { useRouter } from 'next/navigation';
+import { useAppSelector, useAppDispatch } from '@/reducers/hooks'
 
 import { Product } from "@/interfaces/interfaces";
 
+import Loading from "@/components/Loading";
+
+import { setLoading } from '@/reducers/slices/loadingSlice';
+
 export default function ProductForm(props: Product) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const [formData, setFormData] = useState<Product>({
     _id: props._id || undefined,
@@ -18,6 +24,7 @@ export default function ProductForm(props: Product) {
   });
 
   async function saveProduct(e: any) {
+    dispatch(setLoading(true));
     e.preventDefault();
 
     if (formData._id) {
@@ -33,34 +40,29 @@ export default function ProductForm(props: Product) {
         }
       });
     }
+
+    dispatch(setLoading(false));
   }
 
   async function getImages() {
+    dispatch(setLoading(true));
+
     try {
-      axios
-        .get(`/api/products/${formData._id}/uploadImages`, {
-          responseType: 'arraybuffer'
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            const uint8Array = new Uint8Array(res.data);
-
-            // Convert the Uint8Array to a binary string
-            const binaryString = uint8Array.reduce((data, byte) => data + String.fromCharCode(byte), '');
-
-            // Convert the binary string to base64
-            const base64String = btoa(binaryString);
-
-            setFormData({ ...formData, images: [...(formData.images || []), base64String] });
-          }
-        });
-    }
-    catch (error) {
+      const response = await axios.get(`/api/products/${formData._id}/getImages`);
+      if (response.status === 200) {
+        const base64Images = response.data;
+        setFormData({ ...formData, images: base64Images });
+      }
+    } catch (error) {
       console.error("Error getting images:", error);
     }
+
+    dispatch(setLoading(false));
   }
 
   async function uploadImages(e: any) {
+    dispatch(setLoading(true));
+
     const files = Array.from(e.target?.files);
 
     if (files?.length > 0) {
@@ -75,51 +77,59 @@ export default function ProductForm(props: Product) {
           })
           .then((res) => {
             if (res.status === 200) {
-              getImages();
+              setTimeout(() => {
+                getImages();
+              }, 500);
             }
           });
       } catch (error) {
         console.error("Error uploading images:", error);
       }
     }
+
+    dispatch(setLoading(false));
   }
 
   return (
-    <form onSubmit={saveProduct}>
-      <label className="label">Product Name</label>
-      <input type="text" placeholder="product name" onChange={(e) => setFormData({ ...formData, title: e.target.value })} value={formData.title} className="basicInput" />
+    <>
+      <form onSubmit={saveProduct}>
+        <label className="label">Product Name</label>
+        <input type="text" placeholder="product name" onChange={(e) => setFormData({ ...formData, title: e.target.value })} value={formData.title} className="basicInput" />
 
-      <label className="label">Description</label>
-      <textarea placeholder="description" onChange={(e) => setFormData({ ...formData, description: e.target.value })} value={formData.description} className="basicTextarea" />
+        <label className="label">Description</label>
+        <textarea placeholder="description" onChange={(e) => setFormData({ ...formData, description: e.target.value })} value={formData.description} className="basicTextarea" />
 
-      <label className="label">Photos</label>
-      <div className="mb-2 flex flex-wrap gap-2">
-        {formData.images?.map(image => {
-          return (
-            <div key={image} className="h-24">
-              <img src={`data:image/jpeg;base64,${image}`} alt={formData.title} className="img" />
+        <label className="label">Photos</label>
+        <div className="mb-2 flex flex-wrap gap-2">
+          {formData.images?.map(image => {
+            return (
+              <div key={image} className="h-24">
+                <img src={`data:image/jpeg;base64,${image}`} alt={formData.title} className="img" />
+              </div>
+            )
+          })}
+
+          <label className="w-24 h-24 cursor-pointer flex flex-col items-center justify-center text-gray-500 text-sm rounded-lg bg-gray-200 duration-300 hover:bg-gray-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <div>
+              Upload
             </div>
-          )
-        })}
+            <input disabled={formData._id ? false : true} type="file" multiple onChange={uploadImages} className="hidden" />
+          </label>
 
-        <label className="w-24 h-24 cursor-pointer flex flex-col items-center justify-center text-gray-500 text-sm rounded-lg bg-gray-200 duration-300 hover:bg-gray-300">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-          </svg>
-          <div>
-            Upload
-          </div>
-          <input type="file" multiple onChange={uploadImages} className="hidden" />
-        </label>
-
-        {!formData.images?.length && <div>No photos in this product</div>}
-      </div>
+          {!formData.images?.length && <div>No photos in this product</div>}
+        </div>
 
 
-      <label className="label">Price (in €)</label>
-      <input type="number" placeholder="price" onChange={(e) => setFormData({ ...formData, price: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value) })} value={formData.price} className="basicInput" />
+        <label className="label">Price (in €)</label>
+        <input type="number" placeholder="price" onChange={(e) => setFormData({ ...formData, price: isNaN(parseFloat(e.target.value)) ? 0 : parseFloat(e.target.value) })} value={formData.price} className="basicInput" />
 
-      <button type="submit" className="btn-primary">{formData._id ? "Save" : "Create"}</button>
-    </form>
+        <button type="submit" className="btn-primary">{formData._id ? "Save" : "Create"}</button>
+      </form>
+
+      <Loading />
+    </>
   )
 }
