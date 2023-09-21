@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
+
 import loadingSlice from '@/reducers/slices/loadingSlice'
 
 const store = configureStore({

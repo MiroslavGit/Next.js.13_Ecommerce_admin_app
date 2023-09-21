@@ -1,32 +1,31 @@
 "use client"
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-
 import { useAppDispatch } from "@/reducers/hooks";
-import { setLoading } from "@/reducers/slices/loadingSlice";
 
 import { Product } from "@/interfaces/interfaces";
+import * as actions from "@/actions/actions";
 
-import Loading from "@/components/Loading";
 import Layout from "@/components/Layout";
+import Loading from "@/components/Loading";
 
 export default function Products() {
   const dispatch = useAppDispatch();
-
   const [products, setProducts] = useState<Product[]>([]);
 
+  function getProducts() {
+    actions.getProducts(dispatch)
+      .then((res) => {
+        setProducts(res.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching products:', error.message);
+      });
+  }
+
   useEffect(() => {
-    dispatch(setLoading(true));
-
-    axios.get("/api/products",).then((res) => {
-      if (res.status === 200) {
-        setProducts(res.data.data)
-        dispatch(setLoading(false));
-      }
-    });
-
+    getProducts();
   }, []);
 
   return (

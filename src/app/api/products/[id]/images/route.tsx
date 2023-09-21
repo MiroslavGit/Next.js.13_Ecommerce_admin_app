@@ -45,3 +45,20 @@ export async function POST(req: NextRequest, { params }: Params) {
 
   return NextResponse.json({ status: 200, uploaded: true });
 }
+
+/* Delete image */
+export async function DELETE(req: NextRequest) {
+  await mongooseConnect();
+  const { bucket } = await connectToDb();
+
+  const { id, image } = req.params;
+
+  const existing = await fileExists(image);
+  if (!existing) {
+    return NextResponse.json({ status: 404, error: 'File not found' });
+  }
+
+  bucket.delete(id, image);
+
+  return NextResponse.json({ status: 200, deleted: true });
+}

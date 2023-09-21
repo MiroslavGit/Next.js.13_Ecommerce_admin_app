@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
 	try {
 		const product = await Product.findOne({ _id: id });
-		return NextResponse.json({ status: 200, product: product });
+		return NextResponse.json({ status: 200, data: product });
 	} catch (error: any) {
 		return NextResponse.json({ status: 500, error: error.message });
 	}
@@ -23,7 +23,7 @@ export async function PUT(req: NextRequest) {
 
 	try {
 		const product = await Product.updateOne({ _id: id }, data);
-		return NextResponse.json({ status: 200, product: product });
+		return NextResponse.json({ status: 200, data: product });
 	} catch (error: any) {
 		return NextResponse.json({ status: 500, error: error.message });
 	}
@@ -36,7 +36,7 @@ export async function DELETE(req: NextRequest) {
 
 	try {
 		const product = await Product.deleteOne({ _id: id });
-		return NextResponse.json({ status: 200, product: product });
+		return NextResponse.json({ status: 200, data: product });
 	} catch (error: any) {
 		return NextResponse.json({ status: 500, error: error.message });
 	}
