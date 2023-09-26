@@ -20,6 +20,7 @@ export default function Home() {
           </span>
         </div>
       </div>
+      <div className="btn-red w-40 text-center" onClick={() => signOut()}>Sign out</div>
     </Layout>
   )
 }

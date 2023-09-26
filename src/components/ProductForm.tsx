@@ -9,7 +9,7 @@ import { useAppSelector, useAppDispatch } from '@/reducers/hooks'
 import { setLoading } from '@/reducers/slices/loadingSlice';
 
 import { Product } from "@/interfaces/interfaces";
-import * as actions from "@/actions/actions";
+import * as actions from "@/actions/productsActions";
 
 import Loading from "@/components/Loading";
 import CachedIcon from '@mui/icons-material/Cached';

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAppDispatch } from '@/reducers/hooks'
 
 import { Product } from "@/interfaces/interfaces";
-import * as actions from "@/actions/actions";
+import * as actions from "@/actions/productsActions";
 
 import Layout from "@/components/Layout";
 import ProductForm from "@/components/ProductForm";

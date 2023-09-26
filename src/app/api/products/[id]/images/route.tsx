@@ -46,7 +46,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   return NextResponse.json({ status: 200, uploaded: true });
 }
 
-/* Delete image */
+/* Delete image by ID*/
 export async function DELETE(req: NextRequest) {
   await mongooseConnect();
   const { bucket } = await connectToDb();

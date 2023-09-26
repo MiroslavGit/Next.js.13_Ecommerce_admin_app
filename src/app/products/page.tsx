@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAppDispatch } from "@/reducers/hooks";
 
 import { Product } from "@/interfaces/interfaces";
-import * as actions from "@/actions/actions";
+import * as actions from "@/actions/productsActions";
 
 import Layout from "@/components/Layout";
 import Loading from "@/components/Loading";
